@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+
+#define NUM_PHILOSOPHERS 5
+pthread_mutex_t forks[NUM_PHILOSOPHERS];
+
+void pickup_forks(int philosopher_id) {
+    int left = philosopher_id;
+    int right = (philosopher_id + 1) % NUM_PHILOSOPHERS;
+    pthread_mutex_lock(&forks[left]);
+    pthread_mutex_lock(&forks[right]);
+}
+
+void putdown_forks(int philosopher_id) {
+    int left = philosopher_id;
+    int right = (philosopher_id + 1) % NUM_PHILOSOPHERS;
+    pthread_mutex_unlock(&forks[left]);
+    pthread_mutex_unlock(&forks[right]);
+}
+
+void *philosopher(void *arg) {
+    int philosopher_id = *(int *)arg;
+    while (1) {
+        pickup_forks(philosopher_id);
+        putdown_forks(philosopher_id);
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t philosophers[NUM_PHILOSOPHERS];
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
+        pthread_mutex_init(&forks[i], NULL);
+        int *id = malloc(sizeof(int));
+        *id = i;
+        pthread_create(&philosophers[i], NULL, philosopher, id);
+    }
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
+        pthread_join(philosophers[i], NULL);
+        pthread_mutex_destroy(&forks[i]);
+    }
+    return 0;
+}
