@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_FILES 100
+#define MAX_FILENAME_LENGTH 50
+
+typedef struct {
+    char name[MAX_FILENAME_LENGTH];
+    int size;
+} File;
+
+File files[MAX_FILES];
+int numFiles = 0;
+
+void createFile(char *filename, int size) {
+    if (numFiles >= MAX_FILES) {
+        printf("Cannot create file. Maximum number of files reached.\n");
+        return;
+    }
+    if (strlen(filename) >= MAX_FILENAME_LENGTH) {
+        printf("Filename is too long.\n");
+        return;
+    }
+    strcpy(files[numFiles].name, filename);
+    files[numFiles].size = size;
+    numFiles++;
+    printf("File '%s' created with size %d.\n", filename, size);
+}
+
+void deleteFile(char *filename) {
+    int i;
+    for (i = 0; i < numFiles; i++) {
+        if (strcmp(files[i].name, filename) == 0) {
+            printf("File '%s' deleted.\n", filename);
+            numFiles--;
+            for (int j = i; j < numFiles; j++) {
+                strcpy(files[j].name, files[j + 1].name);
+                files[j].size = files[j + 1].size;
+            }
+            return;
+        }
+    }
+    printf("File '%s' not found.\n", filename);
+}
+
+void listFiles() {
+    printf("Files in directory:\n");
+    int i;
+    for (i = 0; i < numFiles; i++) {
+        printf("%s - %d bytes\n", files[i].name, files[i].size);
+    }
+}
+
+int main() {
+    int choice, size;
+    char filename[MAX_FILENAME_LENGTH];
+    char c; // To clear input buffer
+
+    while (1) {
+        printf("\n1. Create a file\n");
+        printf("2. Delete a file\n");
+        printf("3. List all files\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter filename: ");
+                scanf("%s", filename);
+                printf("Enter file size (in bytes): ");
+                scanf("%d", &size);
+                createFile(filename, size);
+                break;
+            case 2:
+                printf("Enter filename to delete: ");
+                scanf("%s", filename);
+                deleteFile(filename);
+                break;
+            case 3:
+                listFiles();
+                break;
+            case 4:
+                printf("Exiting program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please enter a number between 1 and 4.\n");
+        }
+
+        // Clear input buffer
+        while ((c = getchar()) != '\n' && c != EOF);
+    }
+
+    return 0;
+}
