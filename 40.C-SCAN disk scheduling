@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to simulate C-SCAN disk scheduling
+void cscan(int head, int requests[], int num_requests, int max_cylinder) {
+    int total_movement = 0;
+
+    // Sort the requests based on cylinder number
+    for (int i = 0; i < num_requests - 1; i++) {
+        for (int j = 0; j < num_requests - i - 1; j++) {
+            if (requests[j] > requests[j + 1]) {
+                int temp = requests[j];
+                requests[j] = requests[j + 1];
+                requests[j + 1] = temp;
+            }
+        }
+    }
+
+    // Service requests while moving in one direction
+    int current_position = head;
+    int index = 0; // Index of the next request to be serviced
+    while (1) {
+        printf("Servicing request at cylinder %d\n", current_position);
+        total_movement += abs(current_position - requests[index]);
+        current_position = requests[index];
+
+        // Move to the next request
+        index++;
+        // Check if reached the last request or end of the disk
+        if (index == num_requests || current_position == max_cylinder) {
+            break;
+        }
+    }
+
+    // Jump back to the beginning of the disk and continue servicing requests
+    current_position = 0;
+    while (1) {
+        printf("Servicing request at cylinder %d\n", current_position);
+        total_movement += abs(current_position - requests[index]);
+        current_position = requests[index];
+
+        // Move to the next request
+        index++;
+        // Check if reached the last request
+        if (index == num_requests) {
+            break;
+        }
+    }
+
+    printf("Total head movement: %d\n", total_movement);
+}
+
+int main() {
+    int head; // Initial position of disk head
+    int num_requests; // Number of disk access requests
+    int max_cylinder; // Maximum cylinder number
+    int requests[100]; // Array to store disk access requests
+
+    // Input initial head position
+    printf("Enter the initial position of the disk head: ");
+    scanf("%d", &head);
+
+    // Input maximum cylinder number
+    printf("Enter the maximum cylinder number: ");
+    scanf("%d", &max_cylinder);
+
+    // Input number of requests
+    printf("Enter the number of disk access requests: ");
+    scanf("%d", &num_requests);
+
+    // Input disk access requests
+    printf("Enter the disk access requests:\n");
+    for (int i = 0; i < num_requests; i++) {
+        printf("Request %d: ", i + 1);
+        scanf("%d", &requests[i]);
+    }
+
+    // Simulate C-SCAN disk scheduling
+    printf("\nSimulating C-SCAN disk scheduling:\n");
+    cscan(head, requests, num_requests, max_cylinder);
+
+    return 0;
+}
