@@ -1,0 +1,65 @@
+#include <stdio.h>
+
+#define MAX_BLOCKS 10
+#define MAX_PROCS 10
+#define MAX_SIZE 100
+
+int blocks[MAX_BLOCKS] = { 20, 35, 45, 60, 75, 80, 90, 105, 110, 120 };
+int procs[MAX_PROCS] = { 15, 24, 36, 42, 50, 65, 77, 85, 95, 100 };
+
+int allocate(int process_size, int *block_index)
+{
+    int i;
+    int best_index = 0;
+    int best_size = 0;
+
+    for (i = 0; i < MAX_BLOCKS; i++) {
+        if (blocks[i] >= process_size && blocks[i] < best_size) {
+            best_index = i;
+            best_size = blocks[i];
+        }
+    }
+
+    if (best_size == 0) {
+        return 0;
+    }
+
+    blocks[best_index] -= process_size;
+    *block_index = best_index;
+
+    return 1;
+}
+
+int deallocate(int block_index, int process_size)
+{
+    if (block_index < 0 || block_index >= MAX_BLOCKS) {
+        return 0;
+    }
+
+    blocks[block_index] += process_size;
+
+    return 1;
+}
+
+int main()
+{
+    int i, j;
+    int alloc_index;
+
+    for (i = 0; i < MAX_PROCS; i++) {
+        if (allocate(procs[i], &alloc_index)) {
+            printf("Process %d is allocated block %d\n", i, alloc_index);
+        } else {
+            printf("Process %d is not allocated\n", i);
+        }
+}
+
+    deallocate(3, 45);
+    printf("Block 3 is deallocated with 45 units of memory\n");
+
+    for (i = 0; i < MAX_BLOCKS; i++) {
+        printf("Block %d: %d\n", i, blocks[i]);
+    }
+
+    return 0;
+}
