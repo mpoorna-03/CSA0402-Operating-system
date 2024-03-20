@@ -1,0 +1,78 @@
+#include <stdio.h>
+
+#define N 5
+#define M 3
+
+int max[N][M] = { {3, 2, 0}, {1, 0, 0}, {2, 1, 1}, {1, 3, 2}, {0, 1, 0} };
+int all[N][M] = { {2, 1, 1}, {1, 0, 0}, {2, 1, 1}, {0, 2, 1}, {0, 1, 0} };
+int avail[M] = { 1, 2, 1 };
+
+int need[N][M];
+
+int total_resources = 7;
+int complete[N] = { 0 };
+int work[M];
+
+void update_need()
+{
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < M; j++) {
+            need[i][j] = max[i][j] - all[i][j];
+        }
+    }
+}
+
+int safety()
+{
+    int work_copy[M], finish[N], count = 0;
+    int flag = 1;
+
+    for (int i = 0; i < M; i++) {
+        work_copy[i] = avail[i];
+    }
+
+    for (int i = 0; i < N; i++) {
+        finish[i] = 0;
+    }
+
+    while (count < N) {
+        int found = 0;
+        for (int i = 0; i < N; i++) {
+            if (finish[i] == 0) {
+                int flag = 1;
+                for (int j = 0; j < M; j++) {
+                    if (need[i][j] > work_copy[j]) {
+                        flag = 0;
+                        break;
+                    }
+                }
+
+                if (flag == 1) {
+                    found = 1;
+                    for (int j = 0; j < M; j++) {
+                        work_copy[j] += all[i][j];
+                    }
+                    finish[i] = 1;
+                    printf("Process %d is executing.\n", i);
+                    count++;
+                }
+            }
+        }
+        if (found == 0) {
+            printf("The system is not in a safe state.\n");
+            return 0;
+        }
+    }
+    printf("The system is in a safe state.\n");
+    return 1;
+}
+
+int main()
+{
+    update_need();
+    for (int i = 0; i < M; i++) {
+        work[i] = avail[i];
+    }
+    safety();
+    return 0;
+}
