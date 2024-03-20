@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void *thread_function(void *arg) {
+    printf("Inside the new thread\n");
+    sleep(2);
+    printf("Exiting the new thread\n");
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t tid1, tid2;
+    printf("Creating two new threads\n");
+    pthread_create(&tid1, NULL, thread_function, NULL);
+    pthread_create(&tid2, NULL, thread_function, NULL);
+    printf("Main thread waiting for the threads to finish...\n");
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL);
+    printf("Threads have finished execution\n");
+
+    // Checking if threads are equal
+    if (pthread_equal(tid1, tid2)) {
+        printf("Threads are equal\n");
+    } else {
+        printf("Threads are not equal\n");
+    }
+
+    return 0;
+}
