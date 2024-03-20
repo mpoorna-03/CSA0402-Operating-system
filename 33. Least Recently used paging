@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define FRAME_SIZE 3 // Number of frames in memory
+
+int main() {
+    int frames[FRAME_SIZE]; // Frames in memory
+    int page_age[FRAME_SIZE]; // Array to keep track of page ages
+    int page_faults = 0; // Counter for page faults
+
+    // Initialize frames and page age to -1 (empty)
+    for (int i = 0; i < FRAME_SIZE; i++) {
+        frames[i] = -1;
+        page_age[i] = -1;
+    }
+
+    // Array to simulate page references (replace this with your own sequence)
+    int page_references[] = {0, 1, 2, 3, 0, 4, 5, 1, 6, 7, 0, 8, 9, 1, 2, 3, 4, 5, 6, 7};
+
+    // Simulate page references
+    for (int i = 0; i < sizeof(page_references) / sizeof(page_references[0]); i++) {
+        int page = page_references[i];
+        bool page_found = false;
+
+        // Check if page is already in memory
+        for (int j = 0; j < FRAME_SIZE; j++) {
+            if (frames[j] == page) {
+                page_found = true;
+                page_age[j] = i; // Update page age
+                break;
+            }
+        }
+
+        // If page is not found, replace the least recently used page in memory with the new page
+        if (!page_found) {
+            int oldest_index = 0;
+            int oldest_age = page_age[0];
+            for (int j = 1; j < FRAME_SIZE; j++) {
+                if (page_age[j] < oldest_age) {
+                    oldest_age = page_age[j];
+                    oldest_index = j;
+                }
+            }
+            frames[oldest_index] = page;
+            page_age[oldest_index] = i;
+            page_faults++;
+        }
+
+        // Print current memory state
+        printf("Page Reference: %d\n", page);
+        printf("Frames in Memory: ");
+        for (int j = 0; j < FRAME_SIZE; j++) {
+            printf("%d ", frames[j]);
+        }
+        printf("\n\n");
+    }
+
+    // Print total page faults
+    printf("Total Page Faults: %d\n", page_faults);
+
+    return 0;
+}
