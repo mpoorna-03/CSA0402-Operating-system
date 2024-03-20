@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+int main(int argc, char *argv[]) {
+    // Define a directory pointer
+    DIR *dir;
+
+    // Define a dirent structure pointer
+    struct dirent *entry;
+
+    // Open the current directory
+    dir = opendir(".");
+
+    // Check if the directory can be opened
+    if (dir == NULL) {
+        perror("Error opening directory");
+        return EXIT_FAILURE;
+    }
+
+    // Iterate through each entry in the directory
+    while ((entry = readdir(dir)) != NULL) {
+        // Print the name of the entry
+        printf("%s\n", entry->d_name);
+    }
+
+    // Close the directory
+    closedir(dir);
+
+    return EXIT_SUCCESS;
+}
