@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 100
+
+// Structure to represent a disk block
+typedef struct DiskBlock {
+    int data;
+    struct DiskBlock* next;
+} DiskBlock;
+
+// Structure to represent a file
+typedef struct File {
+    DiskBlock* firstBlock;
+    DiskBlock* lastBlock;
+} File;
+
+// Function to create a new disk block
+DiskBlock* createBlock(int data) {
+    DiskBlock* newBlock = (DiskBlock*)malloc(sizeof(DiskBlock));
+    if (newBlock != NULL) {
+        newBlock->data = data;
+        newBlock->next = NULL;
+    }
+    return newBlock;
+}
+
+// Function to add a block to the end of a file
+void addBlockToFile(File* file, DiskBlock* newBlock) {
+    if (file->firstBlock == NULL) {
+        file->firstBlock = newBlock;
+        file->lastBlock = newBlock;
+    } else {
+        file->lastBlock->next = newBlock;
+        file->lastBlock = newBlock;
+    }
+}
+
+// Function to read the contents of a file
+void readFile(File* file) {
+    printf("File Contents:\n");
+    DiskBlock* currentBlock = file->firstBlock;
+    while (currentBlock != NULL) {
+        printf("%d ", currentBlock->data);
+        currentBlock = currentBlock->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    File myFile;
+    myFile.firstBlock = NULL;
+    myFile.lastBlock = NULL;
+
+    // Create and add blocks to the file
+    for (int i = 0; i < 10; i++) {
+        DiskBlock* newBlock = createBlock(i);
+        addBlockToFile(&myFile, newBlock);
+    }
+
+    // Read and print the contents of the file
+    readFile(&myFile);
+
+    return 0;
+}
